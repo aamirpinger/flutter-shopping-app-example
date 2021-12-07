@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/core/class/product.dart';
+import 'package:my_app/core/modal/product.dart';
 import 'package:my_app/ui/widgets/item_tile.dart';
 import 'package:my_app/ui/widgets/no_item_tile.dart';
 

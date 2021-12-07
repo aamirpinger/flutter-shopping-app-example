@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/ui/screens/main_screen.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:my_app/ui/screens/main_screen.dart';
 
 import '../route.dart';
 import '../theme.dart';

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:my_app/constants/app_strings.dart';
-import 'package:my_app/core/class/product.dart';
+import 'package:my_app/core/modal/cart_screen_input.dart';
+import 'package:my_app/core/modal/product.dart';
 import 'package:my_app/core/services/product_services.dart';
 import 'package:my_app/ui/widgets/billing_tile.dart';
 import 'package:my_app/ui/widgets/cart_badge.dart';
@@ -78,7 +79,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedItemList.length);
     if (apiCalled == apiCompleted) {
       EasyLoading.dismiss();
     }
@@ -91,9 +91,11 @@ class _MainScreenState extends State<MainScreen> {
         centerTitle: true,
         actions: [
           CartBadge(
-            selectedProducts: selectedItemList,
-            removeFromCart: removeFromCart,
-            resetCart: resetCart,
+            cartScreenInput: CartScreenInput(
+              selectedProducts: selectedItemList,
+              removeFromCart: removeFromCart,
+              resetCart: resetCart,
+            ),
           ),
         ],
       ),

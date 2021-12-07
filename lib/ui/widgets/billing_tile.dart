@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/constants/app_strings.dart';
-import 'package:my_app/core/class/product.dart';
+import 'package:my_app/core/modal/product.dart';
 
 class BillingTile extends StatelessWidget {
   BillingTile({

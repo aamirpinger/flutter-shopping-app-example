@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/core/class/product.dart';
+import 'package:my_app/core/modal/product.dart';
 
 class ItemTile extends StatelessWidget {
   const ItemTile({

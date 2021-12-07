@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants/configs.dart';
 import 'package:my_app/constants/error_strings.dart';
-import 'package:my_app/core/class/product.dart';
+import 'package:my_app/core/modal/product.dart';
 
 class ProductServices {
   static final ProductServices instance = ProductServices._internal();
