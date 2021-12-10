@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/constants/app_strings.dart';
-import 'package:my_app/core/modal/cart_screen_input.dart';
+import 'package:my_app/core/modal/category.dart';
 import 'package:my_app/core/modal/product.dart';
+import 'package:my_app/core/providers/category_provider.dart';
+import 'package:my_app/core/providers/product_provider.dart';
 import 'package:my_app/core/services/product_services.dart';
 import 'package:my_app/ui/widgets/billing_tile.dart';
 import 'package:my_app/ui/widgets/cart_badge.dart';
 import 'package:my_app/ui/widgets/category_tile.dart';
 import 'package:my_app/ui/widgets/product_list_view.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   static const String routeName = '/';
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> {
   ProductServices productServices = ProductServices();
 
   int apiCalled = 0;
   int apiCompleted = 0;
-  List<String> categoryList = [];
-  List<Product>? itemList;
-  List<Product> selectedItemList = [];
-  String selectedCategory = '';
 
   @override
   void initState() {
@@ -41,9 +40,7 @@ class _MainScreenState extends State<MainScreen> {
     EasyLoading.show(status: AppStrings.loading);
     apiCalled++;
     productServices.getCategories().then((response) {
-      setState(() {
-        categoryList = response as List<String>;
-      });
+      ref.read(categoryProvider.notifier).initializeList(response, null);
     }).whenComplete(() => setState(() => apiCompleted++));
 
     fetchProducts('');
@@ -55,26 +52,9 @@ class _MainScreenState extends State<MainScreen> {
     EasyLoading.show(status: AppStrings.loading);
     apiCalled++;
     productServices.getProducts(category).then((List<Product> response) {
-      setState(() {
-        itemList = response;
-      });
+      ref.read(productProvider.notifier).initializeList(response);
+      ref.read(categoryProvider.notifier).updateCategory(category);
     }).whenComplete(() => setState(() => apiCompleted++));
-  }
-
-  void addToCart(dynamic rawProductRecord) {
-    setState(() {
-      selectedItemList.add(rawProductRecord);
-    });
-  }
-
-  void removeFromCart(int id) {
-    setState(() => selectedItemList.removeWhere((element) => element.id == id));
-  }
-
-  void resetCart() {
-    setState(() {
-      selectedItemList = [];
-    });
   }
 
   @override
@@ -83,6 +63,9 @@ class _MainScreenState extends State<MainScreen> {
       EasyLoading.dismiss();
     }
 
+    List<String>? categoryList = ref.watch(categoryProvider).categories;
+    String? selectedCategory = ref.watch(categoryProvider).selectedCategory;
+    List<Product>? productList = ref.watch(productProvider).itemList;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -90,13 +73,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         centerTitle: true,
         actions: [
-          CartBadge(
-            cartScreenInput: CartScreenInput(
-              selectedProducts: selectedItemList,
-              removeFromCart: removeFromCart,
-              resetCart: resetCart,
-            ),
-          ),
+          CartBadge(),
         ],
       ),
       body: Column(
@@ -106,7 +83,6 @@ class _MainScreenState extends State<MainScreen> {
             categoryDropDownItemList: categoryList,
             onChange: (value) {
               if (value != null) {
-                setState(() => selectedCategory = value);
                 fetchProducts(value);
               }
             },
@@ -116,10 +92,9 @@ class _MainScreenState extends State<MainScreen> {
             height: 20,
           ),
           ProductListView(
-            itemList: itemList,
-            addToCart: addToCart,
+            itemList: productList,
           ),
-          BillingTile(productList: selectedItemList)
+          BillingTile()
         ],
       ),
     );
