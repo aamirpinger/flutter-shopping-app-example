@@ -1,31 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/core/modal/product.dart';
+import 'package:my_app/core/providers/cart_provider.dart';
+import 'package:my_app/core/providers/product_provider.dart';
 import 'package:my_app/ui/widgets/item_tile.dart';
 import 'package:my_app/ui/widgets/no_item_tile.dart';
 
-class ProductListView extends StatefulWidget {
-  ProductListView({
-    this.itemList,
-    this.addToCart,
-    this.removeFromCart,
-    this.removeIcon = false,
-  });
+class ProductListView extends ConsumerWidget {
+  ProductListView({required this.itemList, this.removeIcon = false});
 
-  final List<Product>? itemList;
-  final void Function(dynamic)? addToCart;
-  final void Function(int)? removeFromCart;
   final bool removeIcon;
+  final List<Product> itemList;
 
   @override
-  _ProductListViewState createState() => _ProductListViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemListReceived = itemList;
 
-class _ProductListViewState extends State<ProductListView> {
-  @override
-  Widget build(BuildContext context) {
-    final itemListReceived = widget.itemList;
-
-    return itemListReceived == null
+    return itemListReceived.isEmpty
         ? Expanded(child: SizedBox())
         : itemListReceived.isNotEmpty
             ? Expanded(
@@ -35,18 +26,17 @@ class _ProductListViewState extends State<ProductListView> {
                     return ItemTile(
                       product: itemListReceived[index],
                       onTap: () {
-                        setState(
-                          () {
-                            if (widget.addToCart != null) {
-                              widget.addToCart!(itemListReceived[index]);
-                            } else if (widget.removeFromCart != null) {
-                              widget
-                                  .removeFromCart!(itemListReceived[index].id);
-                            }
-                          },
-                        );
+                        if (!removeIcon) {
+                          ref
+                              .read(cartProvider.notifier)
+                              .addToCart(itemListReceived[index]);
+                        } else {
+                          ref
+                              .read(cartProvider.notifier)
+                              .removeFromCart(itemListReceived[index]);
+                        }
                       },
-                      removeIcon: widget.removeIcon,
+                      removeIcon: removeIcon,
                     );
                   },
                 ),

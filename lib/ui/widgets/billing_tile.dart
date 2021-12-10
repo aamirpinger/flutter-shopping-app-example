@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/constants/app_strings.dart';
 import 'package:my_app/core/modal/product.dart';
+import 'package:my_app/core/providers/cart_provider.dart';
 
-class BillingTile extends StatelessWidget {
-  BillingTile({
-    required this.productList,
-  });
-
-  final List<Product> productList;
+class BillingTile extends ConsumerWidget {
   double totalBill = 0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<Product> productList = ref.watch(cartProvider).selectedProducts;
     if (productList.isNotEmpty) {
+      totalBill = 0;
       productList.forEach((element) {
         totalBill += element.price;
       });

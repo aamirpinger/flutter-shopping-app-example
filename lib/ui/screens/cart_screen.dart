@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_app/constants/app_strings.dart';
+import 'package:my_app/core/modal/product.dart';
+import 'package:my_app/core/providers/cart_provider.dart';
 import 'package:my_app/core/services/product_services.dart';
 import 'package:my_app/ui/screens/main_screen.dart';
 import 'package:my_app/ui/widgets/billing_tile.dart';
@@ -7,21 +10,15 @@ import 'package:my_app/ui/widgets/custom_button.dart';
 import 'package:my_app/ui/widgets/product_list_view.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-class CartScreen extends StatefulWidget {
+class CartScreen extends ConsumerWidget {
   static const String routeName = '/cart';
-  CartScreen({required this.cartScreenInput});
-
-  final cartScreenInput;
-
-  @override
-  _CartScreenState createState() => _CartScreenState();
-}
-
-class _CartScreenState extends State<CartScreen> {
   ProductServices productServices = ProductServices();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<Product> selectedProducts =
+        ref.watch(cartProvider).selectedProducts;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -32,24 +29,19 @@ class _CartScreenState extends State<CartScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          BillingTile(productList: widget.cartScreenInput.selectedProducts),
+          BillingTile(),
           SizedBox(
             height: 20,
           ),
           ProductListView(
-            itemList: widget.cartScreenInput.selectedProducts,
-            removeFromCart: (id) {
-              setState(() {
-                widget.cartScreenInput.removeFromCart(id);
-              });
-            },
+            itemList: selectedProducts,
             removeIcon: true,
           ),
-          widget.cartScreenInput.selectedProducts.isNotEmpty
+          selectedProducts.isNotEmpty
               ? CustomButton(
                   title: Text(AppStrings.checkout),
                   backgroundColor: Theme.of(context).primaryColor,
-                  isDisabled: widget.cartScreenInput.selectedProducts.isEmpty,
+                  isDisabled: selectedProducts.isEmpty,
                   onPress: () {
                     Alert(
                         context: context,
@@ -64,7 +56,7 @@ class _CartScreenState extends State<CartScreen> {
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
                             onPressed: () {
-                              widget.cartScreenInput.resetCart();
+                              ref.watch(cartProvider.notifier).resetCart();
                               Navigator.pushNamedAndRemoveUntil(
                                   context,
                                   MainScreen.routeName,

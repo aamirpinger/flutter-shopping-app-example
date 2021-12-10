@@ -1,15 +1,15 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/core/modal/cart_screen_input.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_app/core/modal/product.dart';
+import 'package:my_app/core/providers/cart_provider.dart';
 import 'package:my_app/ui/screens/cart_screen.dart';
 
-class CartBadge extends StatelessWidget {
-  const CartBadge({required this.cartScreenInput});
-
-  final CartScreenInput cartScreenInput;
-
+class CartBadge extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<Product> selectedProducts =
+        ref.watch(cartProvider).selectedProducts;
     return Padding(
       padding: const EdgeInsets.only(right: 20),
       child: GestureDetector(
@@ -17,12 +17,10 @@ class CartBadge extends StatelessWidget {
           Navigator.pushNamed(
             context,
             CartScreen.routeName,
-            arguments: cartScreenInput,
           );
         },
         child: Badge(
-          badgeContent:
-              Text(cartScreenInput.selectedProducts.length.toString()),
+          badgeContent: Text(selectedProducts.length.toString()),
           position: BadgePosition.topEnd(top: 3, end: -20),
           child: Icon(
             Icons.shopping_cart,
